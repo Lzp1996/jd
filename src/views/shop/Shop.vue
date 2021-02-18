@@ -1,5 +1,5 @@
 <template>
-    <div class="wrapper">
+    <div class="shop__wrapper">
       <div class="search">
         <div class="search__back iconfont" @click="handleToHome">&#xe6db;</div>
         <div class="search__content">
@@ -12,7 +12,8 @@
         </div>
       </div>
       <shop-info :item="item" :hideBorder="true" v-if="item.imgUrl"/>
-      <shop-content></shop-content>
+      <shop-content :shopName="item.name"></shop-content>
+      <cart></cart>
     </div>
 </template>
 
@@ -22,6 +23,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { reactive, toRefs } from 'vue'
 import { get } from '../../utils/request'
 import ShopContent from './ShopContent'
+import Cart from './Cart'
 
 const useShopInfoEffect = () => {
   const data = reactive({ item: {} })
@@ -35,6 +37,7 @@ const useShopInfoEffect = () => {
     }
   }
   const { item } = toRefs(data)
+  console.log(item)
   return { item, getItemInfo }
 }
 
@@ -48,7 +51,7 @@ const useBackRouterEffect = () => {
 
 export default {
   name: 'Shop',
-  components: { ShopContent, ShopInfo },
+  components: { Cart, ShopContent, ShopInfo },
   setup () {
     // const item = {
     //   id: 1,
@@ -73,7 +76,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .wrapper {
+  .shop__wrapper {
     padding: 0 .18rem;
     .search {
       display: flex;

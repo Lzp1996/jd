@@ -24,9 +24,17 @@
               <span class="product__item__origin">&yen;{{item.oldPrice}}</span>
             </p>
             <div class="product__number">
-              <span class="product__number__minus">-</span>
-              <span class="product__num">0</span>
-              <span class="product__number__plus">+</span>
+              <span
+                class="product__number__minus"
+                @click="() => { changeCartItem(shopId, item._id, item, -1, shopName) }"
+              >-</span>
+              <span class="product__num">
+                {{ cartList?.[shopId]?.productList?.[item._id]?.count || 0 }}
+              </span>
+              <span
+                class="product__number__plus"
+                @click="() => { changeCartItem(shopId, item._id, item, 1, shopName) }"
+              >+</span>
             </div>
           </div>
         </div>
@@ -38,6 +46,8 @@
 import { useRoute } from 'vue-router'
 import { reactive, toRefs, ref, watchEffect } from 'vue'
 import { get } from '../../utils/request'
+import { useCommonCartEffect } from './commonCartEffect'
+import { useStore } from 'vuex'
 const categories = [
   { name: '全部商品', tab: 'all' },
   { name: '秒杀', tab: 'seckill' },
@@ -52,9 +62,7 @@ const useTabEffect = () => {
   return { currentTab, handleTabClick }
 }
 
-const useProductListEffect = (currentTab) => {
-  const route = useRoute()
-  const shopId = route.params.id
+const useProductListEffect = (currentTab, shopId) => {
   const data = reactive({ productList: [] })
   const getProductList = async () => {
     const result = await get(`/api/shop/${shopId}/products`, {
@@ -73,16 +81,41 @@ const useProductListEffect = (currentTab) => {
   return { productList }
 }
 
+const useCartEffect = () => {
+  const store = useStore()
+  const { cartList, changeCartItemInfo } = useCommonCartEffect()
+  const changeShopName = (shopId, shopName) => {
+    store.commit('changeShopName', { shopId, shopName })
+  }
+  // const getProductCartCount = (shopId, productId) => {
+  //   console.log(shopId, productId)
+  //   return cartList?.[shopId]?.productList?.[productId]?.count || 0
+  // }
+  const changeCartItem = (shopId, productId, productInfo, num, shopName) => {
+    changeCartItemInfo(shopId, productId, productInfo, num)
+    changeShopName(shopId, shopName)
+  }
+
+  return { cartList, changeCartItem }
+}
+
 export default {
   name: 'ShopContent',
+  props: ['shopName'],
   setup () {
+    const route = useRoute()
+    const shopId = route.params.id
     const { currentTab, handleTabClick } = useTabEffect()
-    const { productList } = useProductListEffect(currentTab)
+    const { productList } = useProductListEffect(currentTab, shopId)
+    const { cartList, changeCartItem } = useCartEffect()
     return {
       categories,
       currentTab,
       handleTabClick,
-      productList
+      productList,
+      cartList,
+      shopId,
+      changeCartItem
     }
   }
 }
