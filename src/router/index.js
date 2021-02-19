@@ -24,6 +24,16 @@ const routes = [
     path: '/shop/:id',
     name: 'Shop',
     component: () => import('../views/shop/Shop')
+  },
+  {
+    path: '/orderConfirmation/:id',
+    name: 'orderConfirmation',
+    component: () => import('../views/orderConfirmation/orderConfirmation')
+  },
+  {
+    path: '/orderList',
+    name: 'OrderList',
+    component: () => import('../views/orderList/OrderList')
   }
 ]
 

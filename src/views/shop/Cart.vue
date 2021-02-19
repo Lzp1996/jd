@@ -44,8 +44,8 @@
         <span v-if="results.total">总计: <span class="check__info__price">&yen;{{results.price}}</span></span>
         <span v-else>购物车是空的</span>
       </div>
-      <div class="check__btn">
-        <router-link to="/home">
+      <div class="check__btn" v-show="results.price > 0">
+        <router-link :to="`/orderConfirmation/${shopId}`">
           去结算
         </router-link>
       </div>
@@ -55,62 +55,14 @@
 
 <script>
 import { useStore } from 'vuex'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { useCommonCartEffect } from './commonCartEffect'
+import { useCommonCartEffect } from '../../effect/commonCartEffect'
 
 const useCartEffect = (shopId) => {
-  const { changeCartItemInfo } = useCommonCartEffect()
+  const { changeCartItemInfo, results, productList } = useCommonCartEffect(shopId)
   const store = useStore()
-  const cartList = store.state.cartList
-  // const total = computed(() => {
-  //   const productList = cartList[shopId]
-  //   let count = 0
-  //   if (productList) {
-  //     for (const i in productList) {
-  //       const product = productList[i]
-  //       if (product.selected) {
-  //         count += product.count
-  //       }
-  //     }
-  //   }
-  //   return count
-  // })
-  const results = computed(() => {
-    const result = { total: 0, price: 0, allChecked: true }
-    const productList = cartList[shopId]?.productList
-    if (productList) {
-      for (const i in productList) {
-        const product = productList[i]
-        result.total += product.count
-        if (product.selected) {
-          result.price += (product.price * product.count)
-        }
-        if (product.count > 0 && !product.selected) {
-          result.allChecked = false
-        }
-      }
-    }
-    result.price = result.price.toFixed(2)
-    return result
-  })
-  // const price = computed(() => {
-  //   const productList = cartList[shopId]
-  //   let count = 0
-  //   if (productList) {
-  //     for (const i in productList) {
-  //       const product = productList[i]
-  //       if (product.selected) {
-  //         count += (product.price * product.count)
-  //       }
-  //     }
-  //   }
-  //   return count.toFixed(2)
-  // })
 
-  const productList = computed(() => {
-    return cartList?.[shopId]?.productList || []
-  })
   const changeCartItemSelected = (shopId, productId) => {
     store.commit('changeCartItemSelected', { shopId, productId })
   }
@@ -310,9 +262,10 @@ export default {
         width: .98rem;
         background-color: #4FB0F9 ;
         text-align: center;
-        color: white;
+        color: white !important;
         font-size: .14rem;
         a {
+          color: white;
           text-decoration: none;
         }
       }

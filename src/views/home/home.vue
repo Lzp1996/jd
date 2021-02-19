@@ -11,7 +11,7 @@
 <script>
 import StaticPart from './StaticPart'
 import Nearby from './Nearby'
-import Docker from './Docker'
+import Docker from '../../Docker'
 export default {
   name: 'home',
   components: { Docker, Nearby, StaticPart }
